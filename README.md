@@ -1,5 +1,7 @@
 # FunZone — Real-Time Multiplayer Mini Games Platform
 
+**Developed by Aarzoo Khan**
+
 FunZone is a complete full-stack web app where friends can create a room, share a code and play five server-validated mini games together in real time. It includes accounts, avatars, a global leaderboard, match history, achievements, room chat, rematches and a polished responsive UI.
 
 > **Stack:** React 18 + Vite (client) · Node.js + Express + Socket.IO (server) · MySQL 8 with an automatic in-memory demo fallback · JWT + bcryptjs

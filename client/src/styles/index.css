@@ -535,6 +535,8 @@ textarea:focus, .code-input:focus { border-color: rgba(167,139,250,.7); }
 .footer__inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 30px 0; flex-wrap: wrap; }
 .brand--footer .brand__mark { width: 32px; height: 32px; font-size: .72rem; }
 .footer__tagline { font-size: .8rem; margin: 8px 0 0; }
+.footer__credit { font-size: .78rem; margin: 4px 0 0; }
+.footer__credit strong { color: var(--text); font-weight: 600; }
 .footer__links { display: flex; gap: 22px; font-size: .85rem; color: var(--muted); }
 .footer__links a:hover { color: var(--violet); }
 .footer__copy { font-size: .74rem; display: flex; align-items: center; gap: 6px; margin: 0; }

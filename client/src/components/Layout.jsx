@@ -12,6 +12,7 @@ function Footer() {
             <span className="brand__text">Fun<span>Zone</span></span>
           </div>
           <p className="muted footer__tagline">Five games. One arena. Infinite rematches.</p>
+          <p className="muted footer__credit">Developed by <strong>Aarzoo Khan</strong></p>
         </div>
         <div className="footer__links">
           <a href="/games">Games</a>

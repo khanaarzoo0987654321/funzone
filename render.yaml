@@ -18,6 +18,6 @@ services:
       - key: DATA_STORE
         value: memory
       - key: CLIENT_URL
-        value: https://funzone.onrender.com
+        value: https://funzone-k94k.onrender.com
       - key: JWT_SECRET
         generateValue: true

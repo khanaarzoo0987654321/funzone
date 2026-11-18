@@ -4,6 +4,9 @@
   "private": true,
   "description": "FunZone - Real-Time Multiplayer Mini Games Platform",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "concurrently -n server,client -c cyan,magenta \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "nodemon --watch server --ext js,json server/src/server.js",

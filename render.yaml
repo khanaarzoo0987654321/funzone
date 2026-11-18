@@ -1,0 +1,23 @@
+# Render Blueprint for FunZone (free plan, no credit card required).
+# This deploy serves the built React app, REST API and Socket.IO from one HTTPS origin.
+services:
+  - type: web
+    name: funzone
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATA_STORE
+        value: memory
+      - key: CLIENT_URL
+        value: https://funzone.onrender.com
+      - key: JWT_SECRET
+        generateValue: true

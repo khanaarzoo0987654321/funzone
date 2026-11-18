@@ -74,7 +74,30 @@ Two browser sessions were used simultaneously to simulate two players:
 
 ---
 
-## 4. MySQL status
+## 4. Deployed website verification (Render free tier)
+
+**Live URL:** https://funzone-k94k.onrender.com  
+**Commit deployed:** `c561c4d`  
+**Date:** 19 November 2026
+
+| Flow | Result |
+| --- | --- |
+| HTTPS health endpoint | Pass — `{"ok":true,"status":"healthy","mode":"memory"}` |
+| Frontend served from same origin as API | Pass — React app loaded from `/` |
+| Socket.IO over HTTPS/WSS | Pass — header showed **Online** on both clients; `io()` used `wss://funzone-k94k.onrender.com` |
+| Registration on deployed site | Pass — account `AarzooLive` created and redirected to `/games` |
+| Login after sign-out | Pass — `/login` with the same credentials redirected to `/dashboard` |
+| Room creation | Pass — code `4TJ3QN`, Tic Tac Toe, 2 players |
+| Joining from second browser session | Pass — `GuestLive1120` joined via UI; both showed 2/2 and live connection |
+| Ready + host-only start | Pass — guest ready enabled the host's Start button; game started for both |
+| Multiplayer Tic Tac Toe | Pass — host played cells 1, 2, 3 and guest played 4, 5; server validated the winning line |
+| Results + persistence | Pass — both clients reached `/results/4fb3a7ad-…`; `/api/matches` returned the saved finished match with winner, scores and `three-in-a-row` reason |
+
+The first Build failed because Render's `NODE_ENV=production` skipped devDependencies, so Vite was missing. `render.yaml` was updated to `npm install --include=dev && npm run build`, re-synced, and all subsequent deploys succeeded. `CLIENT_URL` was also corrected to the real assigned Render hostname.
+
+---
+
+## 5. MySQL status
 
 MySQL 8.0.46 is installed and running, but the root account requires a password that was not available in this environment. The project therefore ran in its built-in **in-memory demo mode**, which is selected automatically whenever `DB_PASSWORD` is empty or the connection fails.
 
@@ -84,6 +107,6 @@ MySQL 8.0.46 is installed and running, but the root account requires a password 
 
 ---
 
-## 5. Conclusion
+## 6. Conclusion
 
 All automated tests pass, the production build succeeds, and manual two-browser testing confirmed that all five games, rooms, results, rematch and support pages work with no console errors. The only untested deployment path is live MySQL, due to missing credentials; the in-memory fallback is fully functional for demonstration and development.

@@ -8,6 +8,23 @@ FunZone is a complete full-stack web app where friends can create a room, share 
 
 ---
 
+## 🌐 Live deployment
+
+**Website:** **https://funzone-k94k.onrender.com**  
+**Health check:** https://funzone-k94k.onrender.com/api/health
+
+The React frontend, REST API and Socket.IO server are deployed together on a **free Render Web Service** over HTTPS/WSS. No separate frontend host is needed. The free instance sleeps after a period of inactivity, so the first request may take up to a minute to wake it up.
+
+The deployment is defined by [`render.yaml`](render.yaml) and uses:
+
+- `npm install --include=dev && npm run build` so Vite is available in Render's production environment
+- `npm start` to serve `dist/`, `/api` and Socket.IO from one Express process
+- `DATA_STORE=memory` (no paid database required)
+- a Render-generated `JWT_SECRET` that is never written to Git
+- `CLIENT_URL=https://funzone-k94k.onrender.com`
+
+---
+
 ## 1. Quick start (beginner friendly)
 
 You only need **Node.js 18+** and npm. The project already contains `node_modules` after installation, but on a fresh computer run:

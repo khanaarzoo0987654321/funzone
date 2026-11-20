@@ -74,9 +74,9 @@ See [TESTING_REPORT.md](TESTING_REPORT.md) and [FINAL_TESTING_REPORT.md](FINAL_T
 1. **Live MySQL untested.** The schema and store exist; no credentials were supplied. TLS support is now available but must be enabled with `DB_SSL` only in an authorised environment.
 2. **Memory mode is ephemeral.** The live Render service uses `DATA_STORE=memory`; accounts, rooms and match history reset on restart.
 3. **Free-tier cold start.** The first request after inactivity can take up to about a minute.
-4. **Limited manual live online coverage.** Only Tic Tac Toe was fully played live; the other four online games passed automated socket tests.
+4. **Manual live online coverage is complete.** All five games were played to completion on the live site with two independent players.
 5. **Local privacy is UI-level.** Players must honestly pass the device; local state stays in browser memory.
-6. **The latest local fixes are not deployed.** The live bundle still serves the earlier commit; no deploy was performed.
+6. **Latest fixes are deployed.** The live bundle serves `index-B8Gargke.js` from commit `88f81d1`; post-deploy health, account, profile and gameplay checks passed.
 7. **Screenshots need human visual approval** if the college requires a specific format or resolution.
 8. **No voice/video chat, spectator mode, tournament brackets or native mobile app.**
 9. **Production hardening** would need persistent secret management, token revocation, monitoring and abuse controls.

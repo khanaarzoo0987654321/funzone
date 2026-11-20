@@ -23,6 +23,8 @@ The deployment is defined by [`render.yaml`](render.yaml) and uses:
 - a Render-generated `JWT_SECRET` that is never written to Git
 - `CLIENT_URL=https://funzone-k94k.onrender.com`
 
+The live site was redeployed from commit `88f81d15ea19127e77c279af99d478c21edcf9f4` and serves the production bundle `index-B8Gargke.js`. Health, registration, login, Profile Save, all five local games, and a two-player online Tic Tac Toe match were checked on the deployed site after the deploy.
+
 ---
 
 ## 1. Quick start (beginner friendly)
@@ -264,8 +266,8 @@ FunZone/
 - **Live data uses memory mode.** The free Render deployment sets `DATA_STORE=memory`, so accounts, rooms and match history are cleared when the service restarts. No paid database is configured.
 - **Free-tier cold start.** The first request after inactivity can take up to about a minute.
 - **Live MySQL untested.** The schema and store exist and TLS configuration is ready, but no credentials were supplied and no hosted database was created or changed.
-- **Latest local fixes are not deployed.** The live bundle still serves the earlier commit; profile-save and TLS changes are local only because no deploy was performed.
-- **Limited manual online coverage.** Only Tic Tac Toe was fully played live; the other four online games passed automated socket tests but were not manually played online.
+- **Latest fixes are deployed.** The profile-save fix and opt-in TLS configuration are included in the live bundle.
+- **Manual online coverage is complete.** All five games were played to completion on the live site with two independent players; room create/join, readiness, scoring, results and rematch were verified.
 - **Local mode is honest pass-and-play.** The handoff screen hides information, but a determined player could inspect browser state; local results are not saved.
 - **No voice/video chat, spectator mode, tournament brackets or native mobile app.**
 - **Production hardening** would need persistent secret management, token revocation, monitoring and abuse controls.

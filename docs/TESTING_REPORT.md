@@ -117,11 +117,13 @@ Bugs fixed during that testing: missing `toast.info`, rematch navigation for the
 ## 7. Deployed website verification (Render free tier)
 
 **Live URL:** https://funzone-k94k.onrender.com  
-**Commit verified as deployed at that audit:** `eedb4b2d7c8298e8ff5787a3da6dc83faa64ee11`
+**Commit verified as deployed:** `88f81d15ea19127e77c279af99d478c21edcf9f4`
 
-Health returned `{"ok":true,"status":"healthy","mode":"memory"}`. Frontend, REST API and Socket.IO were served from the same HTTPS origin; registration, login, room creation, joining, ready/start, a full Tic Tac Toe match, results persistence and rematch all passed. The free instance sleeps after inactivity, so the first request can be slow.
+Health returned `{"ok":true,"status":"healthy","mode":"memory"}` after the new deployment restarted the service. The served HTML references `index-B8Gargke.js` and `index-BOS7OokV.css`, matching the local production build.
 
-The live bundle currently serves the earlier asset hash `index-CWLefblD.js`. The profile-save fix and TLS preparation made after that audit are **local changes only** — no deploy was performed.
+Post-deploy checks on the live site passed: registration, login, Profile Save through the UI (success toast; avatar `ninja`, colour `cyan` and bio persisted after reload), all five Local games (legal moves and handoff/reveal behaviour with no console errors), and a two-player Online Tic Tac Toe match with room `ST22L7`, saved match `3c406d49-9626-49ee-942e-43f3cb02b26c`, genuine three-in-a-row result, results page and rematch. Room create/join, readiness and host start were exercised with two independent browser origins. Browser console errors: none. Render dashboard logs were not inspected because dashboard login was not available; health/API/page checks showed no server errors.
+
+The free instance sleeps after inactivity, so the first request can be slow.
 
 ---
 
@@ -136,4 +138,4 @@ The live bundle currently serves the earlier asset hash `index-CWLefblD.js`. The
 
 ## 9. Conclusion
 
-All 32 automated tests pass and the production build succeeds. Both play modes are covered: 9 local tests plus earlier live playthroughs of all five local games, and 5 online socket tests plus live online playthroughs of all five games. The remaining untested path is live MySQL (no credentials supplied). The newest local fixes are staged for deployment; this report will be updated with the actual Render status after the authorized deploy.
+All 32 automated tests pass and the production build succeeds. Both play modes are covered: 9 local tests plus live playthroughs of all five local games, and 5 online socket tests plus live online playthroughs of all five games. The reviewed changes were committed, pushed and deployed to the existing free Render service; post-deploy health, account, profile, local-game, online-match and console checks passed. The only remaining untested path is live MySQL (no credentials supplied).

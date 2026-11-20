@@ -15,11 +15,18 @@ export default function Navbar() {
   const links = user
     ? [
         { to: '/dashboard', label: 'Dashboard', icon: 'home' },
+        { to: '/play', label: 'Play', icon: 'gamepad' },
         { to: '/games', label: 'Games', icon: 'games' },
         { to: '/rooms', label: 'Rooms', icon: 'users' },
+        { to: '/local', label: 'Local', icon: 'sparkles' },
         { to: '/leaderboard', label: 'Leaderboard', icon: 'trophy' },
       ]
-    : [{ to: '/games', label: 'Games', icon: 'games' }, { to: '/leaderboard', label: 'Leaderboard', icon: 'trophy' }];
+    : [
+        { to: '/play', label: 'Play', icon: 'gamepad' },
+        { to: '/games', label: 'Games', icon: 'games' },
+        { to: '/local', label: 'Local', icon: 'sparkles' },
+        { to: '/leaderboard', label: 'Leaderboard', icon: 'trophy' },
+      ];
 
   return (
     <header className="navbar">

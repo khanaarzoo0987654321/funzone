@@ -1,16 +1,21 @@
-import { Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import { LoginPage, RegisterPage } from './pages/AuthPages.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import GamesPage from './pages/GamesPage.jsx';
+import PlayPage from './pages/PlayPage.jsx';
+import LocalGamesPage from './pages/LocalGamesPage.jsx';
+import LocalSetupPage from './pages/LocalSetupPage.jsx';
+import LocalGamePage from './pages/LocalGamePage.jsx';
 import RoomsPage from './pages/RoomsPage.jsx';
 import WaitingRoomPage from './pages/WaitingRoomPage.jsx';
 import GamePage from './pages/GamePage.jsx';
 import ResultsPage from './pages/ResultsPage.jsx';
 import LeaderboardPage from './pages/LeaderboardPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import { LocalGameProvider } from './local/LocalGameContext.jsx';
 import Icon from './components/Icon.jsx';
 import { Link } from 'react-router-dom';
 
@@ -32,6 +37,12 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/play" element={<PlayPage />} />
+        <Route path="/local" element={<LocalGameProvider><Outlet /></LocalGameProvider>}>
+          <Route index element={<LocalGamesPage />} />
+          <Route path="setup/:gameId" element={<LocalSetupPage />} />
+          <Route path="play/:gameId" element={<LocalGamePage />} />
+        </Route>
         <Route path="/games" element={<GamesPage />} />
         <Route path="/leaderboard" element={<LeaderboardPage />} />
         <Route path="/players/:id" element={<ProfilePage />} />

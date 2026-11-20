@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { roomApi, errorMessage } from '../api/client.js';
 import Icon from '../components/Icon.jsx';
 import { Spinner } from '../components/UI.jsx';
@@ -69,6 +69,7 @@ export default function RoomsPage() {
           <h1>Host or join a room</h1>
           <p className="muted">Share your code with friends, or enter theirs to jump straight in.</p>
         </div>
+        <Link to="/local" className="btn btn--accent"><Icon name="gamepad" size={17} /> Playing on one device? Go local</Link>
       </div>
 
       {error && <div className="alert alert--error"><Icon name="x" size={16} /> {error}</div>}

@@ -57,6 +57,7 @@ export default function DashboardPage() {
           <div className="dash-hero__actions">
             <Link to="/games" className="btn btn--primary">Play a game <Icon name="arrow" size={17} /></Link>
             <Link to="/rooms" className="btn btn--glass">Create a room</Link>
+            <Link to="/local" className="btn btn--accent">Local multiplayer</Link>
           </div>
         </div>
         <div className="level-card">

@@ -1,5 +1,4 @@
-import { randomInt, highestScoreResult, resultFrom } from './shared.js';
-import { clamp } from '../utils/helpers.js';
+import { randomInt, clamp, highestScoreResult, resultFrom } from './shared.js';
 
 const GAME_MS = 30_000;
 const TARGET_MS = 1_800;

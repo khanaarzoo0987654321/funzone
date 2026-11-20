@@ -3,7 +3,7 @@ import Icon from '../components/Icon.jsx';
 
 export const CHOICE_EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
 
-export default function RockPaperScissors({ state, myId, act }) {
+export default function RockPaperScissors({ state, myId, act, privateChoices = false, footerNote }) {
   const myChoice = state.choices?.[myId];
   const choosing = state.phase === 'choosing' && state.status === 'playing';
   const reveal = state.lastReveal;
@@ -20,11 +20,12 @@ export default function RockPaperScissors({ state, myId, act }) {
         {state.players.map((player) => {
           const choice = reveal?.choices?.[player.id] || state.choices?.[player.id];
           const isWinner = reveal?.winners?.includes(player.id);
+          const hidden = privateChoices && !reveal?.choices?.[player.id] && player.id !== myId && Boolean(choice);
           return (
             <div key={player.id} className={`rps-player ${choice ? 'has-picked' : ''} ${isWinner ? 'is-winner' : ''}`}>
               <Avatar player={player} size={54} online />
               <strong>{player.username}{player.id === myId ? ' (you)' : ''}</strong>
-              <span className={`rps-choice ${choice ? 'is-visible' : ''}`}>{choice ? CHOICE_EMOJI[choice] : '❔'}</span>
+              <span className={`rps-choice ${choice && !hidden ? 'is-visible' : ''}`}>{hidden ? '✅' : choice ? CHOICE_EMOJI[choice] : '❔'}</span>
               <b className="rps-score">{state.scores?.[player.id] ?? 0} pts</b>
             </div>
           );
@@ -42,7 +43,7 @@ export default function RockPaperScissors({ state, myId, act }) {
           </button>
         ))}
       </div>
-      <p className="muted center"><Icon name="sparkles" size={14} /> All five rounds are scored by the server — no cheating allowed.</p>
+      <p className="muted center"><Icon name="sparkles" size={14} /> {footerNote || 'All five rounds are scored by the server — no cheating allowed.'}</p>
     </div>
   );
 }

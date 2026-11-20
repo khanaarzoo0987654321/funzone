@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { roomApi, errorMessage } from '../api/client.js';
 import GameCard from '../components/GameCard.jsx';
 import Icon from '../components/Icon.jsx';
@@ -34,6 +35,11 @@ export default function GamesPage() {
           <p className="muted">Every game is live, server-validated and ready for your crew.</p>
         </div>
         <div className="page-head__badge"><Icon name="bolt" size={16} /> 5 games online</div>
+      </div>
+
+      <div className="mode-switch" aria-label="Play mode">
+        <span className="mode-switch__option is-active"><Icon name="wifi" size={16} /> Online</span>
+        <Link to="/local" className="mode-switch__option"><Icon name="gamepad" size={16} /> Local</Link>
       </div>
 
       <div className="filter-row">

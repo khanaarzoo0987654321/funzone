@@ -15,7 +15,9 @@ function Footer() {
           <p className="muted footer__credit">Developed by <strong>Aarzoo Khan</strong></p>
         </div>
         <div className="footer__links">
+          <a href="/play">Play modes</a>
           <a href="/games">Games</a>
+          <a href="/local">Local play</a>
           <a href="/leaderboard">Leaderboard</a>
           <a href="/rooms">Rooms</a>
         </div>

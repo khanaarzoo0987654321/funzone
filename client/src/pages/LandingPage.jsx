@@ -52,6 +52,7 @@ export default function LandingPage() {
               {isAuthenticated ? 'Choose a game' : 'Start playing free'} <Icon name="arrow" size={18} />
             </Link>
             <Link to="/games" className="btn btn--glass btn--lg"><Icon name="games" size={18} /> Explore games</Link>
+            <Link to="/local" className="btn btn--accent btn--lg"><Icon name="users" size={18} /> Play locally</Link>
           </div>
           <div className="hero__stats">
             <div><strong>5</strong><span>mini games</span></div>

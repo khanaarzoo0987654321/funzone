@@ -1,4 +1,22 @@
-import crypto from 'node:crypto';
+/**
+ * Browser-safe random helpers. Web Crypto is available in modern browsers and
+ * Node 18+, so the same engines can power both online rooms and local play.
+ */
+const UINT32_RANGE = 0x1_0000_0000;
+
+function secureRandomInt(max) {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi?.getRandomValues) return Math.floor(Math.random() * max);
+
+  const limit = UINT32_RANGE - (UINT32_RANGE % max);
+  const buffer = new Uint32Array(1);
+  let value;
+  do {
+    cryptoApi.getRandomValues(buffer);
+    value = buffer[0];
+  } while (value >= limit);
+  return value % max;
+}
 
 export const SCORE = {
   win: 3,
@@ -17,14 +35,18 @@ export function nextPlayer(state, currentId) {
 export function shuffle(values) {
   const array = [...values];
   for (let i = array.length - 1; i > 0; i -= 1) {
-    const j = crypto.randomInt(0, i + 1);
+    const j = secureRandomInt(i + 1);
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
 }
 
 export function randomInt(max) {
-  return crypto.randomInt(0, max);
+  return secureRandomInt(max);
+}
+
+export function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
 /** Mark a game as finished and store the authoritative score table. */

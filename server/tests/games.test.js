@@ -115,7 +115,8 @@ test('Quick Tap: server computes points, penalises misses and ends on time', () 
   assert.equal(hit.ok, true);
   assert.ok(state.scores.p1 >= 5 && state.scores.p1 <= 20);
 
-  assert.equal(quickTap.apply(state, { type: 'tap', cell: (target + 1) % 25 }, 'p2').ok, true);
+  const missCell = (state.target.cell + 1) % 25;
+  assert.equal(quickTap.apply(state, { type: 'tap', cell: missCell }, 'p2').ok, true);
   assert.equal(state.scores.p2, 0, 'score never drops below zero');
   assert.equal(quickTap.apply(state, { type: 'tap', cell: 3 }, 'p1').ok, false, 'cooldown prevents spam');
 

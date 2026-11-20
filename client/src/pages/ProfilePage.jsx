@@ -39,14 +39,17 @@ export default function ProfilePage() {
 
   async function save() {
     setSaving(true);
-    const result = await authApi.updateProfile({ avatar: form.avatar, avatarColor: form.avatarColor, bio: form.bio });
-    setSaving(false);
-    if (result.ok) {
+    try {
+      const { data } = await authApi.updateProfile({ avatar: form.avatar, avatarColor: form.avatarColor, bio: form.bio });
       await refresh();
-      setData((current) => ({ ...current, player: { ...current.player, ...result.data.profile } }));
+      setData((current) => ({ ...current, player: { ...current.player, ...data.profile } }));
       setEditing(false);
       toast.success('Profile updated!');
-    } else toast.error(result.message || 'Could not save your profile.');
+    } catch (error) {
+      toast.error(errorMessage(error, 'Could not save your profile.'));
+    } finally {
+      setSaving(false);
+    }
   }
 
   if (loading) return <div className="page center"><Spinner label="Loading player profile..." /></div>;

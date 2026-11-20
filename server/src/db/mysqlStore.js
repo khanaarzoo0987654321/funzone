@@ -66,20 +66,32 @@ function dbError(error) {
   throw error;
 }
 
+/**
+ * Build the mysql2 pool configuration. TLS is opt-in via DB_SSL; DB_SSL_CA is
+ * only used when TLS is enabled. With the defaults the config is identical to
+ * the original connection settings, so memory mode and existing deployments
+ * are unaffected.
+ */
+export function buildMysqlConnectionConfig(dbEnv) {
+  const config = {
+    host: dbEnv.host,
+    port: dbEnv.port,
+    user: dbEnv.user,
+    password: dbEnv.password,
+    charset: 'utf8mb4',
+    namedPlaceholders: true,
+    waitForConnections: true,
+    connectionLimit: 10,
+  };
+  if (dbEnv.ssl) config.ssl = dbEnv.sslCa ? { ca: dbEnv.sslCa } : {};
+  return config;
+}
+
 export const mysqlStore = {
   mode: 'mysql',
 
   async init() {
-    const config = {
-      host: env.db.host,
-      port: env.db.port,
-      user: env.db.user,
-      password: env.db.password,
-      charset: 'utf8mb4',
-      namedPlaceholders: true,
-      waitForConnections: true,
-      connectionLimit: 10,
-    };
+    const config = buildMysqlConnectionConfig(env.db);
 
     if (env.db.autoSetup) {
       const root = path.resolve(__dirname, '../../../database/schema.sql');
@@ -163,9 +175,9 @@ export const mysqlStore = {
   async updateProfile(userId, patch) {
     const fields = [];
     const values = [];
-    for (const key of ['avatar', 'avatar_color', 'bio']) {
+    for (const [key, column] of [['avatar', 'avatar'], ['avatarColor', 'avatar_color'], ['avatar_color', 'avatar_color'], ['bio', 'bio']]) {
       if (patch[key] !== undefined) {
-        fields.push(`${key} = ?`);
+        fields.push(`${column} = ?`);
         values.push(patch[key]);
       }
     }

@@ -1,8 +1,9 @@
 # FunZone Testing Report
 
-**Date:** 19 November 2026  
-**Environment:** Windows 11, Node.js v26.10.0, npm 11.19.1, MySQL 8.0.46 installed, Chrome via in-app browser  
-**Data store used for testing:** automatic in-memory fallback (`DATA_STORE=auto`, no DB password supplied)
+**Originally audited:** 19 November 2026  
+**Last updated:** 21 November 2026  
+**Environment:** Windows 11, Node.js v26.10.0, npm 11.19.1, Chrome via in-app browser  
+**Data store used for automated tests:** in-memory (`DATA_STORE=memory`; no database credentials were supplied)
 
 ---
 
@@ -14,14 +15,16 @@ Command:
 npm test
 ```
 
-Result: **17 tests, 17 passed, 0 failed** (≈ 20 s total).
+Result: **32 tests, 32 passed, 0 failed, 0 skipped** (about 21 seconds).
 
 | File | Tests | Result | What it covers |
-| --- | --- | --- | --- |
-| `server/tests/games.test.js` | 7 | 7 pass | Pure game-engine logic: TTT win/draw/timeout, Connect Four gravity/win/full column, RPS rounds and draw, Memory pairs and hidden cards, Quick Tap scoring and time-up |
-| `server/tests/api.test.js` | 5 | 5 pass | Health/store mode, register validation and duplicates, login + JWT-protected routes, room create/join/capacity/leave, profile update, leaderboard and match history |
-| `server/tests/multiplayer.test.js` | 1 | 1 pass | Two real Socket.IO clients create a room, reject a non-member, enforce host-only start and turn order, play Tic Tac Toe to a win, persist the match, update the leaderboard and rematch |
-| `server/tests/multiplayer_games.test.js` | 4 | 4 pass | End-to-end socket play for RPS (five rounds), Connect Four (vertical win), Memory Match (hidden deck, turn order, flips) and Quick Tap (server-side hit/miss scoring) |
+| --- | ---: | --- | --- |
+| `server/tests/games.test.js` | 7 | 7 pass | Game engines: Tic Tac Toe win/draw/timeout, Connect Four gravity/win/full column, RPS rounds and draw, Memory pairs and hidden cards, Quick Tap scoring and time-up |
+| `server/tests/api.test.js` | 6 | 6 pass | Health/store mode, registration validation and duplicates, login + JWT protection, rooms, profile save success/validation/auth errors, leaderboard and match history |
+| `server/tests/local_games.test.js` | 9 | 9 pass | Local catalogue and player ranges, isolated players, all five hot-seat games, privacy handoff, local timeout and rematch |
+| `server/tests/multiplayer.test.js` | 1 | 1 pass | Two real Socket.IO clients complete and persist a Tic Tac Toe match |
+| `server/tests/multiplayer_games.test.js` | 4 | 4 pass | Socket integration for RPS, Connect Four, Memory Match and Quick Tap |
+| `server/tests/mysql_tls.test.js` | 5 | 5 pass | TLS defaults off, CA ignored when disabled, opt-in TLS, CA used only when enabled, env defaults |
 
 Run subsets with `npm run test:games` and `npm run test:api`.
 
@@ -33,80 +36,104 @@ Run subsets with `npm run test:games` and `npm run test:api`.
 npm run build
 ```
 
-Result: build succeeded — 145 modules transformed, `dist/assets/index-*.css` ≈ 44 kB and `dist/assets/index-*.js` ≈ 337 kB (107 kB gzipped). No warnings or errors.
+Result: passed with Vite 6.4.6; 160 modules transformed; no warnings or errors.
+
+```text
+dist/index.html                    0.95 kB  │ gzip:   0.59 kB
+dist/assets/index-BOS7OokV.css     51.49 kB │ gzip:  10.84 kB
+dist/assets/index-B8Gargke.js     371.39 kB │ gzip: 116.95 kB
+```
 
 ---
 
-## 3. Manual browser verification
+## 3. Local multiplayer coverage
 
-Two browser sessions were used simultaneously to simulate two players:
+**Automated — 9 passing tests.** These cover the local catalogue and player ranges for all five games, isolated local player identities, turn alternation, hidden boards/choices during handoff, a per-player timed turn in Quick Tap, local timeout handoff and rematch.
 
-- Tab A: `http://localhost:5173` logged in as `browser_alice`
-- Tab B: `http://127.0.0.1:5173` logged in as `browser_bob` (different origin → separate localStorage/JWT)
+**Manually played earlier on the live site** (recorded in `FINAL_TESTING_REPORT.md` on 20 November 2026; not repeated today):
 
-### Flows checked
+| Game | Observed result |
+| --- | --- |
+| Tic Tac Toe | completed, 3/1 scores, handoff after each move |
+| Connect Four | completed, 3/1 scores |
+| Rock Paper Scissors | completed, 5/0, hidden `❔` choice until reveal |
+| Memory Match | pair, mismatch and handoff verified |
+| Quick Tap | 20/19 with separate 10-second turns |
+
+Local results are shown on screen only; they are not saved online.
+
+---
+
+## 4. Online multiplayer coverage
+
+**Automated — 5 passing socket tests.** One full Tic Tac Toe integration test covers REST membership before socket join, host-only start, turn order, a win, persistence and rematch. Four more tests cover RPS (five rounds), Connect Four (gravity and vertical win), Memory Match (hidden symbols and turn order) and Quick Tap (server-side hit/miss scoring).
+
+**Manually played earlier on the live deployment** (20 November 2026): room `VN832H`, match `9fd330bd-6857-484d-82c7-08a94eeb1251`, host won 3/1 with reason `three-in-a-row`; the saved result and standings were visible.
+
+**Manually completed live on 21 November 2026** against `https://funzone-k94k.onrender.com` using two independent browser origins (`localhost:5002` and `127.0.0.1:5002`) and two separate accounts. Room creation, REST join, socket join, readiness, host start, gameplay, server scoring, results and rematch were verified for each game:
+
+| Game | Room | Saved match | Result | Notes |
+| --- | --- | --- | --- | --- |
+| Tic Tac Toe (earlier) | VN832H | `9fd330bd-6857-484d-82c7-08a94eeb1251` | Host won 3/1, `three-in-a-row` | Full online flow verified earlier. |
+| Rock Paper Scissors | 92YLSM | `e89b7be0-2e32-4b4c-8664-327b6970a7e5` | `livetest917863b` won 2/0, `rounds-complete` | Five-round flow and rematch verified. Some individual rounds timed out because of slow scripted clicks; the match still completed and scored on the server. |
+| Connect Four | PLRD5P | `02237677-b6f5-43ad-877e-d0d55ceedc86` | `livetest917863a` won 3/1, `connect-four` | A genuine vertical four-in-a-row was completed in 3 seconds; rematch verified. Earlier harness-timed matches were not counted as passes. |
+| Memory Match | 4QPQAJ | `4f3cb464-f33f-4218-8a1a-8a0b0c39af40` | `livetest917863a` won 10/6, `all-pairs-found` | All 16 cards (8 pairs) matched; hidden symbols were never leaked to clients; rematch verified. |
+| Quick Tap | G9WN7H | `33e4fce4-8f0c-486c-9d5f-2097ea066a91` | `livetest917863a` won 621/267, `time-up` | Hits 56/29 and misses 139/195 recorded server-side; shared 30-second match; rematch verified. |
+
+No application defect was confirmed in these flows. The earlier timeouts were caused by slow test-harness interaction, not by the deployed game logic.
+
+---
+
+## 5. Profile save verification
+
+The previously reported `result.ok` bug is fixed. An API test checks that a PATCH succeeds with `{ profile }`, that avatar, colour and bio persist through `/api/auth/me` and `/api/users/:id`, that a partial patch keeps other fields, and that 400 validation and 401 unauthenticated requests are rejected without changing the profile.
+
+A local browser check was also performed on 20 November 2026 using a temporary account: the success toast appeared, the editor closed, and the avatar, cyan colour and bio survived a reload. A 241-character bio showed the validation message and left the Save button usable.
+
+---
+
+## 6. Manual browser verification (historical, 19 November 2026)
+
+Two browser sessions were used with different origins to simulate two players:
+
+- Tab A: `http://localhost:5173` as `browser_alice`
+- Tab B: `http://127.0.0.1:5173` as `browser_bob`
 
 | Flow | Result |
 | --- | --- |
-| Landing page render and navigation | Pass — hero, game lineup, stats and CTAs visible |
-| Registration of two accounts | Pass — both redirected to `/games` |
-| Game catalogue and create-room form | Pass — all five games selectable |
-| Room creation with unique 6-character code | Pass — code `XE8NBZ` generated |
-| Joining by code from second session | Pass — both showed 2/2 players and live connection |
-| Ready / unready and host-only start | Pass — non-host start was rejected in automated test; UI disabled correctly |
-| Waiting room chat and copy-code control | Pass — rendered without errors |
-| Tic Tac Toe live play | Pass — board updated for both clients, winner detected, both navigated to `/results/:matchId` |
-| Results page | Pass — winner heading, standings, “Saved” badge, confetti, rematch/leaderboard actions |
-| Rematch | Pass — room reset to waiting and players returned; follower auto-navigation added after browser test |
-| Rock Paper Scissors UI | Pass — round pips, player choices, scores and locked-in state render; scoring verified in automated test |
-| Connect Four UI | Pass — seven drop columns, turn indicator and piece placement; one drop switched turn correctly |
-| Memory Match UI | Pass — 16 hidden cards, pair counter, flip totals and turn banner render |
-| Quick Tap UI | Pass — 5×5 grid, match countdown, hit/miss counters and target prompt render |
-| Leaderboard and profile pages | Pass — rendered with data from saved matches |
-| Browser console (both tabs) | No errors after final fixes |
+| Landing, catalogue and navigation | Pass |
+| Two registrations and room creation with 6-character code | Pass |
+| Join from second session, ready and host-only start | Pass |
+| Waiting-room chat and copy-code control | Pass |
+| Live Tic Tac Toe, results, saved badge and rematch | Pass |
+| RPS / Connect Four / Memory / Quick Tap UI smoke checks | Pass |
+| Leaderboard and profile rendering | Pass |
+| Browser console (both tabs) | No errors |
 
-### Bug found and fixed during testing
-
-1. `toast.info` was missing from `ToastContext`, causing a console error when a rematch/notice toast fired. Added `info` to the context.
-2. `ResultsPage` did not listen for the rematch state broadcast, so the non-requesting player stayed on the results screen. Added a `room:state` listener that navigates both players back to the waiting room.
-3. Automated socket tests initially waited for errors on the wrong client; corrected so the acting socket’s `game:error` is asserted.
-4. Connect Four test expected a loser score of 0; the design awards 1 participation point, so the assertion was corrected.
+Bugs fixed during that testing: missing `toast.info`, rematch navigation for the non-requesting player, wrong socket assertion target, and an incorrect Connect Four loser-score expectation.
 
 ---
 
-## 4. Deployed website verification (Render free tier)
+## 7. Deployed website verification (Render free tier)
 
 **Live URL:** https://funzone-k94k.onrender.com  
-**Commit deployed:** `c561c4d`  
-**Date:** 19 November 2026
+**Commit verified as deployed at that audit:** `eedb4b2d7c8298e8ff5787a3da6dc83faa64ee11`
 
-| Flow | Result |
-| --- | --- |
-| HTTPS health endpoint | Pass — `{"ok":true,"status":"healthy","mode":"memory"}` |
-| Frontend served from same origin as API | Pass — React app loaded from `/` |
-| Socket.IO over HTTPS/WSS | Pass — header showed **Online** on both clients; `io()` used `wss://funzone-k94k.onrender.com` |
-| Registration on deployed site | Pass — account `AarzooLive` created and redirected to `/games` |
-| Login after sign-out | Pass — `/login` with the same credentials redirected to `/dashboard` |
-| Room creation | Pass — code `4TJ3QN`, Tic Tac Toe, 2 players |
-| Joining from second browser session | Pass — `GuestLive1120` joined via UI; both showed 2/2 and live connection |
-| Ready + host-only start | Pass — guest ready enabled the host's Start button; game started for both |
-| Multiplayer Tic Tac Toe | Pass — host played cells 1, 2, 3 and guest played 4, 5; server validated the winning line |
-| Results + persistence | Pass — both clients reached `/results/4fb3a7ad-…`; `/api/matches` returned the saved finished match with winner, scores and `three-in-a-row` reason |
+Health returned `{"ok":true,"status":"healthy","mode":"memory"}`. Frontend, REST API and Socket.IO were served from the same HTTPS origin; registration, login, room creation, joining, ready/start, a full Tic Tac Toe match, results persistence and rematch all passed. The free instance sleeps after inactivity, so the first request can be slow.
 
-The first Build failed because Render's `NODE_ENV=production` skipped devDependencies, so Vite was missing. `render.yaml` was updated to `npm install --include=dev && npm run build`, re-synced, and all subsequent deploys succeeded. `CLIENT_URL` was also corrected to the real assigned Render hostname.
+The live bundle currently serves the earlier asset hash `index-CWLefblD.js`. The profile-save fix and TLS preparation made after that audit are **local changes only** — no deploy was performed.
 
 ---
 
-## 5. MySQL status
+## 8. MySQL and TLS status
 
-MySQL 8.0.46 is installed and running, but the root account requires a password that was not available in this environment. The project therefore ran in its built-in **in-memory demo mode**, which is selected automatically whenever `DB_PASSWORD` is empty or the connection fails.
-
-- Schema, foreign keys, indexes and seeded achievements are provided in `database/schema.sql`.
-- `mysqlStore` implements the same async interface as `memoryStore`, with parameterized queries.
-- MySQL mode remains untested live; it can be enabled by supplying credentials in `.env` as documented in the README.
+- MySQL 8.0.46 is installed locally, but no credentials were supplied, so live MySQL mode remains **untested**.
+- `database/schema.sql` defines 8 tables and 5 seeded achievements; `mysqlStore` uses parameterized queries and the same interface as `memoryStore`.
+- TLS is now opt-in through `DB_SSL` and `DB_SSL_CA`, disabled by default. Five tests check the configuration without connecting to a database or using any certificate.
+- No account, database, credential or certificate was created or entered. Render environment variables and production memory mode were not changed.
 
 ---
 
-## 6. Conclusion
+## 9. Conclusion
 
-All automated tests pass, the production build succeeds, and manual two-browser testing confirmed that all five games, rooms, results, rematch and support pages work with no console errors. The only untested deployment path is live MySQL, due to missing credentials; the in-memory fallback is fully functional for demonstration and development.
+All 32 automated tests pass and the production build succeeds. Both play modes are covered: 9 local tests plus earlier live playthroughs of all five local games, and 5 online socket tests plus live online playthroughs of all five games. The remaining untested path is live MySQL (no credentials supplied). The newest local fixes are staged for deployment; this report will be updated with the actual Render status after the authorized deploy.

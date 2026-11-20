@@ -26,6 +26,8 @@ export const env = {
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'funzone',
     autoSetup: (process.env.DB_AUTO_SETUP || 'false').toLowerCase() === 'true',
+    ssl: (process.env.DB_SSL || 'false').toLowerCase() === 'true',
+    sslCa: process.env.DB_SSL_CA || '',
   },
 };
 

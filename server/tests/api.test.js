@@ -139,3 +139,44 @@ test('profile updates, leaderboard and match history endpoints work', async () =
   const missing = await api('/api/matches/not-a-real-id', { token });
   assert.equal(missing.status, 404);
 });
+
+test('profile save persists every field and handles validation and auth errors', async () => {
+  const user = await register('api_profile_save');
+  const token = user.data.token;
+
+  const updated = await api('/api/users/me', {
+    method: 'PATCH',
+    token,
+    body: { avatar: 'ninja', avatarColor: 'cyan', bio: 'Speedrunner' },
+  });
+  assert.equal(updated.status, 200);
+  assert.deepEqual(Object.keys(updated.data), ['profile'], 'client must read data.profile, not result.ok');
+  assert.equal(updated.data.profile.avatar, 'ninja');
+  assert.equal(updated.data.profile.avatar_color, 'cyan', 'camelCase avatarColor maps to avatar_color');
+  assert.equal(updated.data.profile.bio, 'Speedrunner');
+
+  const me = await api('/api/auth/me', { token });
+  assert.equal(me.data.user.avatar_color, 'cyan', 'colour survives a session refresh');
+
+  const publicProfile = await api(`/api/users/${user.data.user.id}`, { token });
+  assert.equal(publicProfile.data.player.avatar_color, 'cyan');
+
+  const partial = await api('/api/users/me', { method: 'PATCH', token, body: { bio: 'Only the bio changed' } });
+  assert.equal(partial.status, 200);
+  assert.equal(partial.data.profile.avatar_color, 'cyan', 'a partial patch keeps the colour');
+  assert.equal(partial.data.profile.bio, 'Only the bio changed');
+
+  const longBio = await api('/api/users/me', { method: 'PATCH', token, body: { bio: 'x'.repeat(241) } });
+  assert.equal(longBio.status, 400);
+  assert.match(longBio.data.error, /240 characters/);
+
+  const badColour = await api('/api/users/me', { method: 'PATCH', token, body: { avatarColor: 'BAD COLOR!' } });
+  assert.equal(badColour.status, 400);
+  assert.equal(badColour.data.error, 'Invalid avatar colour.');
+
+  const noToken = await api('/api/users/me', { method: 'PATCH', body: { bio: 'Should not save' } });
+  assert.equal(noToken.status, 401);
+
+  const afterErrors = await api('/api/auth/me', { token });
+  assert.equal(afterErrors.data.user.bio, 'Only the bio changed', 'rejected updates leave the profile unchanged');
+});

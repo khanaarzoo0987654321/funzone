@@ -124,8 +124,8 @@ export const memoryStore = {
 
   async updateProfile(userId, patch) {
     const profile = ensureProfile(userId);
-    const allowed = ['avatar', 'avatar_color', 'bio'];
-    for (const key of allowed) if (patch[key] !== undefined) profile[key] = patch[key];
+    const allowed = { avatar: 'avatar', avatarColor: 'avatar_color', avatar_color: 'avatar_color', bio: 'bio' };
+    for (const [key, column] of Object.entries(allowed)) if (patch[key] !== undefined) profile[column] = patch[key];
     profile.updated_at = nowIso();
     return one(profile);
   },
